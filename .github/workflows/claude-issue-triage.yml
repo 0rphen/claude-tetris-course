@@ -55,4 +55,8 @@ jobs:
 
                **Labels asignados**: lista de labels aplicados y por qué.
 
+               El comentario debe estar escrito en formato Markdown válido y bien interpretable por
+               GitHub (encabezados con `##`, negritas con `**texto**`, listas con `-`, bloques de código
+               con backticks para nombres de archivos/funciones, etc.).
+
             No modifiques código ni abras pull requests — solo etiqueta y comenta el issue.
