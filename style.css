@@ -1,61 +1,64 @@
-:root {
-  --bg: #0f0f17;
-  --text: #e0e0e0;
-  --accent: #7aa2f7;
-  --panel-bg: #1a1a25;
-  --border: #2a2a3a;
-  --label-color: #555570;
-  --kbd-bg: #22223a;
-  --kbd-border: #3a3a5a;
-  --kbd-text: #aaa;
-  --controls-text: #888;
-  --overlay-bg: rgba(10, 10, 20, 0.75);
-  --overlay-title: #e57373;
-  --restart-bg: #7aa2f7;
-  --restart-text: #0f0f17;
-  --restart-hover: #9bbdff;
-  --grid-color: #22222e;
-}
-
-html[data-theme='light'] {
-  --bg: #f0f2f7;
-  --text: #22222e;
-  --accent: #3d5fd0;
-  --panel-bg: #ffffff;
-  --border: #d0d4e0;
-  --label-color: #8888a0;
-  --kbd-bg: #e4e6f0;
-  --kbd-border: #c0c4d8;
-  --kbd-text: #555;
-  --controls-text: #666;
-  --overlay-bg: rgba(240, 242, 247, 0.85);
-  --overlay-title: #d32f2f;
-  --restart-bg: #3d5fd0;
-  --restart-text: #ffffff;
-  --restart-hover: #5a7ae0;
-  --grid-color: #dcdfe8;
-}
-
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+:root,
+[data-theme="dark"] {
+  --bg: #0f0f17;
+  --fg: #e0e0e0;
+  --accent: #7aa2f7;
+  --muted: #555570;
+  --panel-border: #2a2a3a;
+  --panel-bg: #1a1a25;
+  --kbd-bg: #22223a;
+  --kbd-border: #3a3a5a;
+  --kbd-fg: #aaa;
+  --controls: #888;
+  --overlay: rgba(10, 10, 20, 0.75);
+  --btn-fg: #0f0f17;
+  --shadow: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] {
+  --bg: #f4f6fb;
+  --fg: #1a1a2e;
+  --accent: #3d5afe;
+  --muted: #7a7a94;
+  --panel-border: #c8cde0;
+  --panel-bg: #ffffff;
+  --kbd-bg: #e8ecf7;
+  --kbd-border: #b8c0d8;
+  --kbd-fg: #445;
+  --controls: #555;
+  --overlay: rgba(240, 242, 250, 0.82);
+  --btn-fg: #ffffff;
+  --shadow: rgba(40, 50, 90, 0.18);
+}
+
 body {
   background: var(--bg);
-  color: var(--text);
+  color: var(--fg);
   font-family: system-ui, -apple-system, sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   user-select: none;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .wrapper {
   position: relative;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .game-title {
@@ -64,27 +67,20 @@ body {
   font-weight: 800;
   letter-spacing: 6px;
   color: var(--accent);
-  margin-bottom: 16px;
-  text-shadow: 0 0 20px rgba(122, 162, 247, 0.5);
+  margin-bottom: 0;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
 .theme-toggle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
   background: var(--panel-bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 16px;
-  line-height: 1;
+  color: var(--accent);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  letter-spacing: 0.5px;
 }
 
 .theme-toggle:hover {
@@ -99,10 +95,10 @@ body {
 
 #board {
   display: block;
-  border: 1px solid var(--border);
+  border: 1px solid var(--panel-border);
   background: var(--panel-bg);
   border-radius: 4px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 40px var(--shadow);
 }
 
 /* ---- Panel lateral ---- */
@@ -123,7 +119,7 @@ body {
 .label {
   font-size: 10px;
   letter-spacing: 2px;
-  color: var(--label-color);
+  color: var(--muted);
   font-weight: 600;
 }
 
@@ -137,7 +133,7 @@ body {
 
 #next-canvas {
   display: block;
-  border: 1px solid var(--border);
+  border: 1px solid var(--panel-border);
   background: var(--panel-bg);
   border-radius: 4px;
 }
@@ -152,7 +148,7 @@ body {
 
 .controls li {
   font-size: 12px;
-  color: var(--controls-text);
+  color: var(--controls);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -165,7 +161,7 @@ kbd {
   padding: 1px 6px;
   font-size: 11px;
   font-family: inherit;
-  color: var(--kbd-text);
+  color: var(--kbd-fg);
 }
 
 /* ---- Overlay ---- */
@@ -175,7 +171,7 @@ kbd {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--overlay-bg);
+  background: var(--overlay);
   backdrop-filter: blur(4px);
   border-radius: 4px;
 }
@@ -196,7 +192,7 @@ kbd {
   font-size: 28px;
   font-weight: 800;
   letter-spacing: 4px;
-  color: var(--overlay-title);
+  color: #e57373;
 }
 
 #overlay-score {
@@ -207,8 +203,8 @@ kbd {
 
 #restart-btn {
   margin-top: 8px;
-  background: var(--restart-bg);
-  color: var(--restart-text);
+  background: var(--accent);
+  color: var(--btn-fg);
   border: none;
   border-radius: 6px;
   padding: 10px 28px;
@@ -220,5 +216,5 @@ kbd {
 }
 
 #restart-btn:hover {
-  background: var(--restart-hover);
+  filter: brightness(1.12);
 }

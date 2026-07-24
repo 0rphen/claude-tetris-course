@@ -28,9 +28,6 @@ const PIECES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
-const GRID_COLORS = { dark: '#22222e', light: '#dcdfe8' };
-const THEME_KEY = 'tetris-theme';
-
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
@@ -42,40 +39,8 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
-const themeToggleBtn = document.getElementById('theme-toggle');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
-let currentTheme;
-
-function applyTheme(theme) {
-  currentTheme = theme;
-  if (theme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-  }
-  themeToggleBtn.textContent = theme === 'light' ? '🌞' : '🌙';
-}
-
-function initTheme() {
-  const stored = localStorage.getItem(THEME_KEY);
-  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-  applyTheme(stored || (prefersLight ? 'light' : 'dark'));
-
-  if (!stored && window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
-      if (!localStorage.getItem(THEME_KEY)) applyTheme(e.matches ? 'light' : 'dark');
-    });
-  }
-}
-
-themeToggleBtn.addEventListener('click', () => {
-  const theme = currentTheme === 'light' ? 'dark' : 'light';
-  localStorage.setItem(THEME_KEY, theme);
-  applyTheme(theme);
-});
-
-initTheme();
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -204,7 +169,7 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = GRID_COLORS[currentTheme];
+  ctx.strokeStyle = '#22222e';
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -335,5 +300,43 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+// Theme: prefer saved choice, else match the browser (prefers-color-scheme).
+(function setupTheme() {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const KEY = 'tetris-theme';
+
+  function systemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+      ? 'light'
+      : 'dark';
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    if (btn) {
+      btn.textContent = theme === 'light' ? '☾ Dark' : '☀ Light';
+      btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    }
+  }
+
+  const saved = localStorage.getItem(KEY);
+  apply(saved === 'light' || saved === 'dark' ? saved : systemTheme());
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      localStorage.setItem(KEY, next);
+      apply(next);
+    });
+  }
+
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+      if (!localStorage.getItem(KEY)) apply(e.matches ? 'light' : 'dark');
+    });
+  }
+})();
 
 init();
