@@ -105,6 +105,13 @@ body {
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
 }
 
+html[data-skin='neon'] #board,
+html[data-skin='neon'] #next-canvas {
+  background: #050507;
+  border-color: #1a2a3a;
+  box-shadow: 0 0 40px rgba(0, 246, 255, 0.15), 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
 /* ---- Panel lateral ---- */
 .panel {
   width: 160px;
@@ -140,6 +147,24 @@ body {
   border: 1px solid var(--border);
   background: var(--panel-bg);
   border-radius: 4px;
+}
+
+.skin-select {
+  background: var(--panel-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.skin-select:hover,
+.skin-select:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 /* ---- Controles ---- */
