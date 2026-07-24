@@ -13,7 +13,10 @@ const COLORS = [
   '#e57373', // Z - red
   '#90caf9', // J - pale blue
   '#ffb74d', // L - orange
+  '#455a64', // bomb
 ];
+
+const BOMB_EVERY = 10;
 
 const PIECES = [
   null,
@@ -45,6 +48,7 @@ const restartBtn = document.getElementById('restart-btn');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+let bombPending, nextBombAt;
 let currentTheme;
 
 function applyTheme(theme) {
@@ -85,6 +89,10 @@ function randomPiece() {
   const type = Math.floor(Math.random() * 7) + 1;
   const shape = PIECES[type].map(row => [...row]);
   return { type, shape, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
+}
+
+function makeBomb() {
+  return { type: 8, shape: [[8]], x: Math.floor(COLS / 2), y: 0, isBomb: true };
 }
 
 function collide(shape, ox, oy) {
@@ -143,6 +151,10 @@ function clearLines() {
     score += (LINE_SCORES[cleared] || 0) * level;
     level = Math.floor(lines / 10) + 1;
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    if (lines >= nextBombAt) {
+      bombPending = true;
+      while (lines >= nextBombAt) nextBombAt += BOMB_EVERY;
+    }
     updateHUD();
   }
 }
@@ -171,14 +183,32 @@ function softDrop() {
 }
 
 function lockPiece() {
-  merge();
-  clearLines();
+  if (current.isBomb) {
+    explodeBomb();
+  } else {
+    merge();
+    clearLines();
+  }
   spawn();
+}
+
+function explodeBomb() {
+  const cx = current.x, cy = current.y;
+  let destroyed = 0;
+  for (let r = cy - 1; r <= cy + 1; r++)
+    for (let c = cx - 1; c <= cx + 1; c++)
+      if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c]) {
+        board[r][c] = 0;
+        destroyed++;
+      }
+  score += destroyed * 50;
+  updateHUD();
 }
 
 function spawn() {
   current = next;
-  next = randomPiece();
+  next = bombPending ? makeBomb() : randomPiece();
+  bombPending = false;
   if (collide(current.shape, current.x, current.y)) {
     endGame();
   }
@@ -200,6 +230,12 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
   // highlight
   context.fillStyle = 'rgba(255,255,255,0.12)';
   context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+  if (colorIndex === 8) {
+    context.font = `${Math.floor(size * 0.7)}px sans-serif`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('💣', x * size + size / 2, y * size + size / 2 + 1);
+  }
   context.globalAlpha = 1;
 }
 
@@ -302,6 +338,8 @@ function init() {
   dropInterval = 1000;
   dropAccum = 0;
   lastTime = performance.now();
+  bombPending = false;
+  nextBombAt = BOMB_EVERY;
   next = randomPiece();
   spawn();
   updateHUD();
